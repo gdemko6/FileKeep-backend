@@ -1,0 +1,104 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+#define NUMCPUS 2  // your number of cpus here
+
+typedef struct __counter_t {
+    int global;                
+    pthread_mutex_t glock;     
+    int local[NUMCPUS];        
+    pthread_mutex_t llock[NUMCPUS]; 
+    int threshold;             
+} counter_t;
+
+
+void init(counter_t *c, int threshold) {
+    c->threshold = threshold;
+    c->global = 0;
+    pthread_mutex_init(&c->glock, NULL);
+    for (int i = 0; i < NUMCPUS; i++) {
+        c->local[i] = 0;
+        pthread_mutex_init(&c->llock[i], NULL);
+    }
+}
+
+
+void update(counter_t *c, int threadID, int amt) {
+    int cpu = threadID % NUMCPUS;
+    pthread_mutex_lock(&c->llock[cpu]);
+    c->local[cpu] += amt;
+    if (c->local[cpu] >= c->threshold) {
+        pthread_mutex_lock(&c->glock);
+        c->global += c->local[cpu];
+        pthread_mutex_unlock(&c->glock);
+        c->local[cpu] = 0;
+    }
+    pthread_mutex_unlock(&c->llock[cpu]);
+}
+
+
+int get(counter_t *c) {
+    pthread_mutex_lock(&c->glock);
+    int val = c->global;
+    pthread_mutex_unlock(&c->glock);
+    return val;
+}
+
+
+void *increment_counter(void *arg) {
+    counter_t *c = (counter_t *)arg;
+    int target = 1000000; 
+    int threadID = (int)pthread_self();
+    
+    for (int i = 0; i < target; i++) {
+        update(c, threadID, 1);
+    }
+    return NULL;
+}
+
+int main() {
+    counter_t counter;
+    int thread_counts[] = {1, 2, 4, 8};
+    int thresholds[] = {1, 4, 16, 64, 256};
+    int targets[] = {1000000, 10000000, 100000000};
+    
+    for (int t = 0; t < 3; t++) { 
+        for (int i = 0; i < 4; i++) { // for each thread count
+            for (int j = 0; j < 5; j++) { // for each threshold
+                int num_threads = thread_counts[i];
+                int threshold = thresholds[j];
+                int target = targets[t];
+
+                init(&counter, threshold);
+                pthread_t threads[num_threads];
+                
+                struct timeval start, end;
+                gettimeofday(&start, NULL);
+                
+                
+                for (int k = 0; k < num_threads; k++) {
+                    pthread_create(&threads[k], NULL, increment_counter, &counter);
+                }
+                
+                for (int k = 0; k < num_threads; k++) {
+                    pthread_join(threads[k], NULL);
+                }
+                
+                gettimeofday(&end, NULL);
+                
+                long seconds = end.tv_sec - start.tv_sec;
+                long micros = end.tv_usec - start.tv_usec;
+                if (micros < 0) {
+                    seconds -= 1;
+                    micros += 1000000;
+                }
+                
+                printf("Threads: %d, Threshold: %d, Target: %d, Time: %ld.%06ld seconds\n",
+                       num_threads, threshold, target, seconds, micros);
+            }
+        }
+    }
+    return 0;
+}

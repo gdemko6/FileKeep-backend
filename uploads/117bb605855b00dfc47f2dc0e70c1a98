@@ -1,0 +1,5 @@
+const content = document.querySelector(".dropdown-content");
+const button = document.querySelector(".hamburger");
+button.addEventListener("click", () => {
+  content.classList.toggle("visible");
+});
