@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://gdemko-filemanager.app",
     credentials: true,
   })
 );
@@ -29,7 +29,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },
+    cookie: { maxAge: 1000 * 60 * 60 * 24, secure: true, sameSite: "none" },
     store: new PrismaSessionStore(prisma, {
       checkPeriod: 500 * 60 * 1000,
     }),
