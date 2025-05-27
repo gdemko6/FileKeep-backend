@@ -1,29 +1,15 @@
 {
-  "name": "file-uploader",
+  "name": "filemanager-backend",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gdemko6/file-uploader.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/gdemko6/file-uploader/issues"
-  },
-  "homepage": "https://github.com/gdemko6/file-uploader#readme",
-  "description": "",
   "dependencies": {
     "@quixo3/prisma-session-store": "^3.1.13",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
