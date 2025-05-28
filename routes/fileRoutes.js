@@ -71,7 +71,7 @@ router.get("/:fileId/download", ensureAuthenticated, async (req, res) => {
       return res.status(404).send("File not found");
     }
 
-    if (file.userId !== req.user.id || file.folderId !== req.params.id) {
+    if (file.userId !== req.user.id) {
       return res.status(403).send("Unauthorized");
     }
 
