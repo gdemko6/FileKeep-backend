@@ -14,6 +14,7 @@ const fileRoutes = require("./routes/fileRoutes");
 const logoutRoutes = require("./routes/logoutRoutes");
 const app = express();
 const prisma = new PrismaClient();
+app.set("trust proxy", 1);
 
 app.use(
   cors({
