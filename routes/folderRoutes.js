@@ -7,6 +7,7 @@ const fs = require("fs").promises;
 // Middleware to check authentication
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) return next();
+  console.log("user not authenticated");
   res.status(401).json({ message: "Unauthorized: Please log in" });
 }
 
