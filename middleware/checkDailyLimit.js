@@ -11,7 +11,7 @@ module.exports = async function checkDailyLimit(req, res, next) {
   const fileCount = await prisma.file.count({
     where: {
       userId,
-      createdAt: {
+      uploadedAt: {
         gte: startOfDay,
       },
     },
