@@ -25,6 +25,13 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use((err, req, res, next) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ message: "File too large. Max is 50MB." });
+  }
+  next(err);
+});
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
